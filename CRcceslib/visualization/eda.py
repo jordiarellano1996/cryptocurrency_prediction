@@ -9,6 +9,7 @@ from scipy import stats
 
 import importlib  # importlib.reload(module)
 import reduce_memory_m
+from CRcceslib.data_processor import sequence_transform
 
 
 def load_data(folder_path, debug=False, seed=2021):
@@ -79,8 +80,10 @@ def missing_statistics(df):
 
 
 if __name__ == "__main__":
-    PATH = "../input/g-research-crypto-forecasting/"
-    EXP = "../"
+    cdw = os.getcwd()   # get the working directory
+
+    PATH = cdw + "/../" + "input/g-research-crypto-forecasting"
+    EXP = cdw + "/../"
     EXP_MODEL = os.path.join(EXP, "model")
     EXP_FIG = os.path.join(EXP, "fig")
     EXP_PREDS = os.path.join(EXP, "preds")
@@ -96,7 +99,12 @@ if __name__ == "__main__":
     supple_train = reduce_memory_m.reduce_mem_usage(supple_train, force_float=["Count"])
 
     """Compare distributions"""
-    # compare_plt_col_dist(train, supple_train, supple_train.columns, figsize_in=(20, 8), save_path="../fig/compare_polt")
+    # compare_plt_col_dist(train, supple_train, supple_train.columns,
+    #                      figsize_in=(20, 8), save_path="../fig/compare_polt")
+
+    """Add missing rows (every minute it might be one data row)"""
+    train = preprocessor.reindex_timestamp(train)
+    supple_train = preprocessor.reindex_timestamp(supple_train)
 
     """Check if in the data set there is missing data"""
     print(missing_statistics(train))
