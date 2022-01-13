@@ -47,6 +47,5 @@ class DTSequence(DataTransformUtility):
         self.window_price_fluctuation(window_target_in)
         self.sort_by_index()
         df = self.get_df()
-        df.drop(['low', 'high', 'open'], axis=1, inplace=True)
-        df.reset_index(inplace=True)
+        df.drop(['low', 'high', 'open', 'time'], axis=1, inplace=True)
         return df
