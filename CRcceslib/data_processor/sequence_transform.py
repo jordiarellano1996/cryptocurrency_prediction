@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 
 
 class DataTransformUtility:
@@ -11,12 +10,8 @@ class DataTransformUtility:
 
     def fill_timestamp_gaps(self, granularity=60):
         """"""
-        s1 = self.__df.shape[0]
         self.__df = self.__df.reindex(range(self.__df.index[0], self.__df.index[-1] + granularity, granularity),
                                       method='pad')
-        if self.verbose:
-            print(f"Number of rows missing and added pad: {self.__df.shape[0] - s1}")
-            print(f"Ducplicated index on added rows: {self.__df.index.duplicated().sum()}")
 
     def add_vwap(self):
         """"""
@@ -25,10 +20,13 @@ class DataTransformUtility:
 
     def window_price_fluctuation(self, window_minute):
         """Get close price increment/decrement in time window """
-        self.__df['p1'] = self.__df["close"].shift(-1)
-        self.__df['p2'] = self.__df["close"].shift(-(window_minute + 1))
+        self.__df["timestamp"] = self.__df.index
+        self.__df.set_index("time", inplace=True)
+        self.__df['p1'] = self.__df["close"].shift(freq='-1T')
+        self.__df['p2'] = self.__df["close"].shift(freq=f'-{window_minute + 1}T')
         self.__df[f'return_{window_minute}min'] = np.log(self.__df.p2 / self.__df.p1)
         self.__df.drop(['p1', 'p2'], axis=1, inplace=True)
+        self.__df.set_index("timestamp", inplace=True)
 
     def sort_by_index(self, ascending_in=True):
         self.__df.sort_index(ascending=ascending_in, inplace=True)
@@ -40,7 +38,6 @@ class DataTransformUtility:
 
 class DTSequence(DataTransformUtility):
     """"""
-
     def __init__(self, data_frame):
         super().__init__(data_frame)
 
