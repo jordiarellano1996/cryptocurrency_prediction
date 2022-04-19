@@ -112,6 +112,7 @@ class HistoricalData(object):
         data["time"] = pd.to_datetime(data["time"], unit='s')
         data = data[data['time'].between(start, end)]
         data.set_index("time", drop=True, inplace=True)
+        data.index = pd.to_datetime(data.index)
         data.sort_index(ascending=True, inplace=True)
         data.drop_duplicates(subset=None, keep='first', inplace=True)
         data.reset_index(inplace=True)
